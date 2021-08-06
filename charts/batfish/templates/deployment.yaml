@@ -1,0 +1,63 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ include "batfish.fullname" . }}
+  labels:
+    {{- include "batfish.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "batfish.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "batfish.selectorLabels" . | nindent 8 }}
+    spec:
+      volumes:
+        - name: file-authorizer-configs
+          configMap:
+            name: {{ include "batfish.fullname" . }}-file-authorizer
+            defaultMode: 420
+        - name: file-authorizer
+          emptyDir: {}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "batfish/batfish:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 9996
+              protocol: TCP
+            - containerPort: 9997
+              protocol: TCP
+          env:
+            - name: API_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "batfish.fullname" . }}-file-authorizer
+                  key: apikey
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+          command:
+            - sh
+          args:
+            - '-c'
+            - >
+              cp /file-authorizer-configs/users.json /fileauthorizer/users.json && cp /file-authorizer-configs/perms.json /fileauthorizer/perms.json &&
+              java
+              -XX:-UseCompressedOops
+              -XX:+UseContainerSupport
+              -XX:MaxRAMPercentage=80
+              -cp allinone-bundle.jar org.batfish.allinone.Main
+              -clientargs "-apikey $API_KEY"
+              -runclient false
+              -loglevel {{ .Values.logLevel }}
+              -coordinatorargs "-templatedirs questions -containerslocation /data/containers -authorizertype file"

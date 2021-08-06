@@ -1,0 +1,19 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ include "batfish.fullname" . }}
+  labels:
+    {{- include "batfish.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: batfish-v2
+      protocol: TCP
+      port: 9996
+      targetPort: {{ .Values.service.batfishV2Port }}
+    - name: batfish-v1
+      protocol: TCP
+      port: 9997
+      targetPort: {{ .Values.service.batfishV1Port }}
+  selector:
+    {{- include "batfish.selectorLabels" . | nindent 4 }}

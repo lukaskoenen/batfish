@@ -1,0 +1,45 @@
+# Default values for batfish.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  pullPolicy: Always
+  tag: ""
+
+# batfish default api key
+apikey: "00000000000000000000000000000000"
+logLevel: "warn"
+
+volumeMounts:
+  - name: file-authorizer-configs
+    readOnly: true
+    mountPath: /file-authorizer-configs/users.json
+    subPath: users.json
+  - name: file-authorizer-configs
+    readOnly: true
+    mountPath: /file-authorizer-configs/perms.json
+    subPath: perms.json
+  - name: file-authorizer
+    mountPath: /fileauthorizer
+
+replicaCount: 1
+
+resources:
+  limits:
+    cpu: '2'
+    memory: 8G
+  requests:
+    cpu: '1'
+    memory: 4G
+
+podAnnotations: {}
+
+securityContext: {}
+
+# set to custom hostname (cf. openshift hostname)
+hostname: "localhost"
+
+service:
+  type: ClusterIP
+  batfishV1Port: 9997
+  batfishV2Port: 9996

@@ -1,0 +1,17 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: {{ include "batfish.fullname" . }}-v2
+  labels:
+    {{- include "batfish.labels" . | nindent 4 }}
+spec:
+  host: {{ include "batfish.fullname" . }}.{{ .Values.hostname }}
+  path: /v2
+  to:
+    kind: Service
+    name: {{ include "batfish.fullname" . }}
+  port:
+    targetPort: batfish-v2
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
