@@ -60,6 +60,7 @@ import org.batfish.datamodel.Ip6;
 import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.Prefix6;
 import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.datamodel.routing_policy.expr.DecrementMetric;
@@ -136,6 +137,7 @@ import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Sb_networkContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Sb_redistributeContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Sbaf_ipv4_unicastContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Sbaf_l2vpn_evpnContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Sbafi6_aggregate_addressContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Sbafi6_importContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Sbafi_aggregate_addressContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Sbafi_importContext;
@@ -634,6 +636,14 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
           ctx.rm.getText(),
           BGP_ADDRESS_FAMILY_L2VPN_ADVERTISE_IPV6_UNICAST,
           ctx.getStart().getLine());
+    }
+  }
+
+  @Override
+  public void exitSbafi6_aggregate_address(Sbafi6_aggregate_addressContext ctx) {
+    Prefix6 prefix = Prefix6.parse(ctx.IPV6_PREFIX().getText());
+    if (!_currentBgpVrf.getIpv6Unicast().getAggregateNetworks().add(prefix)) {
+      _w.addWarning(ctx, getFullText(ctx), _parser, "Overwriting aggregate-address for " + prefix);
     }
   }
 

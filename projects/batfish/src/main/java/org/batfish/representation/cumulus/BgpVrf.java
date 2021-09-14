@@ -19,6 +19,7 @@ public class BgpVrf implements Serializable {
   private final @Nonnull Map<String, BgpNeighbor> _neighbors;
   private @Nonnull Map<Prefix, BgpNetwork> _networks;
   private @Nullable BgpIpv4UnicastAddressFamily _ipv4Unicast;
+  private @Nullable BgpIpv6UnicastAddressFamily _ipv6Unicast;
   private @Nullable BgpL2vpnEvpnAddressFamily _l2VpnEvpn;
   private @Nullable Ip _routerId;
   private @Nullable Ip _clusterId;
@@ -39,6 +40,10 @@ public class BgpVrf implements Serializable {
 
   public boolean isIpv4UnicastActive() {
     return _defaultIpv4Unicast || (_ipv4Unicast != null);
+  }
+
+  public boolean isIpv6UnicastActive() {
+    return _ipv6Unicast != null;
   }
 
   public boolean getDefaultIpv4Unicast() {
@@ -79,12 +84,24 @@ public class BgpVrf implements Serializable {
     return _ipv4Unicast;
   }
 
+  public @Nullable BgpIpv6UnicastAddressFamily getIpv6Unicast() {
+    return _ipv6Unicast;
+  }
+
   public BgpIpv4UnicastAddressFamily getOrCreateIpv4Unicast() {
     if (_ipv4Unicast != null) {
       return _ipv4Unicast;
     }
     _ipv4Unicast = new BgpIpv4UnicastAddressFamily();
     return _ipv4Unicast;
+  }
+
+  public BgpIpv6UnicastAddressFamily getOrCreateIpv6Unicast() {
+    if (_ipv6Unicast != null) {
+      return _ipv6Unicast;
+    }
+    _ipv6Unicast = new BgpIpv6UnicastAddressFamily();
+    return _ipv6Unicast;
   }
 
   public @Nullable BgpL2vpnEvpnAddressFamily getL2VpnEvpn() {

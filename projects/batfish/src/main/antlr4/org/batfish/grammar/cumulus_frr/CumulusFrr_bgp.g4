@@ -141,8 +141,9 @@ sbaf_ipv6_unicast
 :
   IPV6 UNICAST NEWLINE
   (
-    sbafi6_import
-    |  sbafi6_null_tail
+    sbafi6_aggregate_address
+    | sbafi6_import
+    | sbafi6_null_tail
   )*
 ;
 
@@ -186,6 +187,11 @@ sbafl_neighbor
 sbafi_aggregate_address
 :
   AGGREGATE_ADDRESS IP_PREFIX agg_feature* NEWLINE
+;
+
+sbafi6_aggregate_address
+:
+  AGGREGATE_ADDRESS IPV6_PREFIX NEWLINE
 ;
 
 agg_feature
